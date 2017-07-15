@@ -16,12 +16,12 @@ namespace ImageProcessing
         private static int defaultWidth = 8000;
         static void Main(string[] args)
         {
-            string fileName = "IMG_4464"; //  this is the input image name. But there should be a buttonOnClick method for recording input img path purpose.
+           
            
             try {
-                Image myImg = Image.FromFile("C:\\Users\\kkdhuiyu\\Desktop\\IMG_4464.jpg");
+                Image myImg = Image.FromFile("C:\\Users\\kkdhuiyu\\Desktop\\IMG_4464.jpg"); // the input image path.
                 Image afterResize = ResizeImage(myImg, defaultWidth, defaultHeight);
-                afterResize.Save("C:\\Users\\kkdhuiyu\\Desktop\\afterResizeIMG_4464.jpg");
+                afterResize.Save("C:\\Users\\kkdhuiyu\\Desktop\\afterResizeIMG_4464.jpg"); // the output  image path.
             }
             catch(FileNotFoundException e)
             {
