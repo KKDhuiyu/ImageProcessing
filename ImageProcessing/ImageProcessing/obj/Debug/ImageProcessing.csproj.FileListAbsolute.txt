@@ -1,0 +1,6 @@
+C:\Users\kkdhuiyu\Desktop\ImageProcessing\ImageProcessing\obj\Debug\ImageProcessing.csprojResolveAssemblyReference.cache
+C:\Users\kkdhuiyu\Desktop\ImageProcessing\ImageProcessing\bin\Debug\ImageProcessing.exe.config
+C:\Users\kkdhuiyu\Desktop\ImageProcessing\ImageProcessing\bin\Debug\ImageProcessing.exe
+C:\Users\kkdhuiyu\Desktop\ImageProcessing\ImageProcessing\bin\Debug\ImageProcessing.pdb
+C:\Users\kkdhuiyu\Desktop\ImageProcessing\ImageProcessing\obj\Debug\ImageProcessing.exe
+C:\Users\kkdhuiyu\Desktop\ImageProcessing\ImageProcessing\obj\Debug\ImageProcessing.pdb
