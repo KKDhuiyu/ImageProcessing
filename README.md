@@ -11,7 +11,11 @@ K = 3
 __________________________________________________________________________________________________________________________________________
 Original: 
 ![img_4938](https://user-images.githubusercontent.com/17542785/28244640-ea90f6d8-6a43-11e7-95dd-bea22f17189d.JPG)
+
 Risized:
+
 ![afterresizeimg_4466](https://user-images.githubusercontent.com/17542785/28244641-ec059b36-6a43-11e7-8004-e8e980aff1f2.jpg)
+
 Segemented:
+
 ![segmimg](https://user-images.githubusercontent.com/17542785/28244642-ecc3f7ca-6a43-11e7-8fb5-f678c6053d1c.jpg)
