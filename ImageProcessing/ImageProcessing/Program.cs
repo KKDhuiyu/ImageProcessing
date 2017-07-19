@@ -13,32 +13,33 @@ namespace ImageProcessing
 {
     class Program
     {
-        private static int defaultHeight = 2400;
-        private static int defaultWidth = 8000;
+        private static int defaultHeight = 500;
+        private static int defaultWidth = 500;
         private static Image img;
         private static int[][] finalMeans;
         static void Main(string[] args)
         {
             Boolean hasImage = false;
-           
-            try {
-                Image myImg = Image.FromFile("C:\\Users\\kkdhuiyu\\Desktop\\IMG_1439.jpg"); // the input image path.
+
+            try
+            {
+                Image myImg = Image.FromFile("C:\\Users\\kkdhuiyu\\Desktop\\IMG_2408.jpg"); // the input image path.
                 Image afterResize = ResizeImage(myImg, defaultWidth, defaultHeight);
                 afterResize.Save("C:\\Users\\kkdhuiyu\\Desktop\\afterResizeIMG_4466.jpg"); // the output  image path.
                 hasImage = true;
                 img = myImg;
             }
-            catch(FileNotFoundException e)
+            catch (FileNotFoundException e)
             {
-               Console.WriteLine("Please ensure your file location is valid");
+                Console.WriteLine("Please ensure your file location is valid");
             }
             if (hasImage)
             {
-      
-                int numClusters = 3;
+
+                int numClusters = 4;
                 double[][] rawData = getDataFromImage();
                 finalMeans = new int[numClusters][];
-                
+
                 Console.WriteLine("Setting numClusters to " + numClusters);
 
                 int[] clustering = Cluster(rawData, numClusters);
@@ -48,7 +49,15 @@ namespace ImageProcessing
                 Console.WriteLine("Raw data by cluster:");
                 ShowClustered(rawData, clustering, numClusters, 1);
                 generateSegmImg(clustering);
+                Console.WriteLine("Image generated");
+                List<double[]> colorList = mostSignificantColors(rawData);
+                for (int i = 0; i < colorList.Count && i < 10; i++)
+                {
+                    Console.WriteLine(String.Join(",", colorList.ElementAt(i).Select(p => p.ToString()).ToArray()));
+                }
+                Console.WriteLine("Number of diff colors: "+ colorList.Count);
                 Console.ReadLine();
+               
 
             }
 
@@ -136,12 +145,12 @@ namespace ImageProcessing
             }
             return result;
         }
-       
+
         private static bool UpdateMeans(double[][] data, int[] clustering, double[][] means)
         {
             int numClusters = means.Length;
             int[] clusterCounts = new int[numClusters];
-            
+
             for (int i = 0; i < data.Length; ++i)
             {
                 int cluster = clustering[i];
@@ -166,9 +175,10 @@ namespace ImageProcessing
             }
 
             for (int k = 0; k < means.Length; ++k)
-                for (int j = 0; j < means[k].Length; ++j) {
+                for (int j = 0; j < means[k].Length; ++j)
+                {
                     means[k][j] /= clusterCounts[k]; // danger of div by 0
-                  
+
                 }
             return true;
         }
@@ -216,8 +226,18 @@ namespace ImageProcessing
         private static double Distance(double[] tuple, double[] mean)
         {
             double sumSquaredDiffs = 0.0;
-            for (int j = 0; j < tuple.Length; ++j)
-                sumSquaredDiffs += Math.Pow((tuple[j] - mean[j]), 2);
+            double deltaR = tuple[0] - mean[0];
+            double deltaG = tuple[1] - mean[1];
+            double deltaB = tuple[2] - mean[2];
+            double avgR = (tuple[0] + mean[0]) / 2;
+            sumSquaredDiffs += (2 + avgR / 256) * Math.Pow((deltaR), 2);
+            sumSquaredDiffs += 4 * Math.Pow((deltaG), 2);
+            sumSquaredDiffs += (2 + (255 - avgR)) * Math.Pow((deltaB), 2);
+            // return getColorDiff(c1,c2);
+            if (sumSquaredDiffs == 0)
+            {
+                return 0;
+            }
             return Math.Sqrt(sumSquaredDiffs);
         }
 
@@ -250,13 +270,13 @@ namespace ImageProcessing
             }
             if (newLine) Console.WriteLine("");
         }
- 
+
         static void ShowClustered(double[][] data, int[] clustering,
           int numClusters, int decimals)
         {
             for (int k = 0; k < numClusters; ++k)
             {
-                Console.WriteLine("==================="+String.Join(",", finalMeans[k]));
+                Console.WriteLine("===================" + String.Join(",", finalMeans[k]));
                 int printControl = 0;
                 for (int i = 0; i < data.Length - 100; i++)
                 {
@@ -264,17 +284,17 @@ namespace ImageProcessing
                     if (clusterID != k) continue;
                     Console.Write(i.ToString().PadLeft(3) + " ");
                     printControl++;
-                    for (int j = 0;j < data[i].Length; j++)
+                    for (int j = 0; j < data[i].Length; j++)
                     {
                         if (data[i][j] >= 0.0) Console.Write(" ");
                         Console.Write(data[i][j].ToString("F" + decimals) + " ");
-                       
-                        
+
+
                     }
                     Console.WriteLine("");
                     if (printControl > 100)
                     {
-                        i = data.Length + 1;   
+                        i = data.Length + 1;
                     }
                 }
 
@@ -290,7 +310,7 @@ namespace ImageProcessing
         }
         private static double[][] getDataFromImage()
         {
-            double[][] result= new double[img.Height*img.Width][];
+            double[][] result = new double[img.Height * img.Width][];
             Bitmap bmp = new Bitmap(img);
             Rectangle rect = new Rectangle(0, 0, bmp.Width, bmp.Height);
             BitmapData bmpData = bmp.LockBits(rect, ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
@@ -313,26 +333,27 @@ namespace ImageProcessing
             {
                 for (int row = 0; row < bmpData.Width; row++)
                 {
-                    b[count] = (byte)(rgbValues[(column * stride) + (row * 3)]);
-                    g[count] = (byte)(rgbValues[(column * stride) + (row * 3) + 1]);
-                    r[count++] = (byte)(rgbValues[(column * stride) + (row * 3) + 2]);
+                    r[count] = (byte)(rgbValues[(column * stride) + (row * 3)]);
+                    b[count] = (byte)(rgbValues[(column * stride) + (row * 3) + 1]);
+                    g[count++] = (byte)(rgbValues[(column * stride) + (row * 3) + 2]);
+
                 }
             }
-            for(int i=0; i < r.Length; i++)
+            for (int i = 0; i < result.Length; i++)
             {
-                result[i] = new double[] {r[i],b[i],g[i]};
+                result[i] = new double[] { r[i], b[i], g[i] };
             }
             return result;
         }
-     private static void calculateFinalMean(double[][] data, int[] clustering,int numOfCluster)
+        private static void calculateFinalMean(double[][] data, int[] clustering, int numOfCluster)
         {
-            for(int i = 0; i < numOfCluster; i++)
+            for (int i = 0; i < numOfCluster; i++)
             {
                 double r = 0, g = 0, b = 0;
                 int count = 0;
                 for (int j = 0; j < clustering.Length; j++)
                 {
-                   
+
                     if (clustering[j] == i)
                     {
                         r += data[j][0];
@@ -344,7 +365,7 @@ namespace ImageProcessing
                 finalMeans[i] = new int[] { (int)r / count, (int)g / count, (int)b / count };
             }
         }
-        private static void generateSegmImg( int[] clustering)
+        private static void generateSegmImg(int[] clustering)
         {
             int[][] segmImgArray = new int[clustering.Length][]; // this array contains rgb data for the output image
             byte[] imgData; // this is the byte array that's converted from the segmImgArray
@@ -370,5 +391,31 @@ namespace ImageProcessing
             Image segmImg = bitmap;
             segmImg.Save("C:\\Users\\kkdhuiyu\\Desktop\\segmIMG.jpg"); // the output  image path.
         }
+        private static List<double[]> mostSignificantColors(double[][] data)
+        {
+            List<double[]> colorList = new List<double[]>();
+            
+            for (int i = 0; i < data.Length; i++)
+            {
+                if (colorList.Count == 0)
+                {
+                    colorList.Add(data[i]);
+                }
+                else
+                {
+                    foreach (double[] x in colorList)
+                    {
+                        double colorDiff=Distance(x, data[i]);
+                        if (colorDiff > 1500)
+                        {
+                            colorList.Add(data[i]);
+                            break;
+                        }
+                    }
+                }
+            }
+            return colorList;
+        }
+      
     }
 }
